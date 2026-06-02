@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Mauri's Barber Shop</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <meta name="theme-color" content="#0f172a">
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/">Inici</a>
+    <a href="/reserva">Reservar</a>
+
+</nav>
+
+<div class="hero">
+
+    <!-- IMATGE -->
+    <img class="hero-img" src="{{ url_for('static', filename='imgbarberia.jpeg') }}">
+
+    <h1>Mauri's Barber Shop 💈</h1>
+
+    <p>Sistema automatitzat de reserves per a clients de Mauri's Barber Shop</p>
+
+    <!-- CLIENT -->
+    <a class="btn" href="/login/client">
+        Entrar com client
+    </a>
+
+    <!-- BARBER -->
+    <a class="btn2" href="/login/barber">
+        Entrar com barber
+    </a>
+
+</div>
+
+<div class="caixa">
+
+    <h2>Serveis i preus</h2>
+
+    <div class="servei">
+        <h3>✂️ Tall de cabell</h3>
+        <p>15€</p>
+    </div>
+
+    <div class="servei">
+        <h3>🧔 Barba</h3>
+        <p>10€</p>
+    </div>
+
+    <div class="servei">
+        <h3>💈 Tall + barba</h3>
+        <p>20€</p>
+    </div>
+
+    <div class="servei">
+        <h3>🔥 Tall + neteja facial</h3>
+        <p>25€</p>
+    </div>
+
+</div>
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/sw.js");
+}
+</script>
+
+</body>
+</html>º
