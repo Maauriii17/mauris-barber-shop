@@ -1,49 +1,85 @@
-<!-- templates/panelbarber.html -->
-
 <!DOCTYPE html>
-<html>
-
+<html lang="ca">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Panel barber</title>
+    <title>Panel barber - Mauri's Barber Shop</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
 <body>
 
 <nav>
+    <div class="logo">MAURI'S BARBER SHOP</div>
 
-    <a href="/">Inici</a>
-
+    <div class="nav-links">
+        <a href="/">Inici</a>
+        <a href="/panelbarber">Reserves</a>
+        <a href="/logout">Tancar sessió</a>
+    </div>
 </nav>
 
-<div class="caixa">
+<section class="panel-section">
 
-<h1>Reserves</h1>
+    <div class="panel-header">
+        <p class="petit-titol">PANEL PRIVAT</p>
+        <h1>Reserves</h1>
+        <p>Consulta i gestiona les cites de la barberia.</p>
+    </div>
 
-{% if cites|length == 0 %}
+    {% if cites|length == 0 %}
 
-<p>No tens reserves encara.</p>
+        <div class="sense-reserves">
+            <h2>No tens reserves encara</h2>
+            <p>Les noves cites apareixeran aquí automàticament.</p>
+        </div>
 
-{% endif %}
+    {% else %}
 
-{% for c in cites %}
+        <div class="reserves-list">
 
-<div class="cita">
+            {% for cita in cites %}
 
-    <h3>{{ c.title }}</h3>
+                <div class="reserva-barber">
 
-    <p><b>Servei:</b> {{ c.service }}</p>
+                    <div class="reserva-data">
+                        <span class="data-reserva">{{ cita.dia }}</span>
+                        <span class="hora-reserva">{{ cita.hora }}</span>
+                    </div>
 
-    <p><b>Data i hora:</b> {{ c.start }}</p>
+                    <div class="reserva-detalls">
 
-</div>
+                        <h3>{{ cita.nom }}</h3>
 
-{% endfor %}
+                        <p>
+                            <strong>Servei:</strong>
+                            {{ cita.servei }}
+                        </p>
 
-</div>
+                        <p>
+                            <strong>Preu:</strong>
+                            {{ cita.preu }} €
+                        </p>
+
+                    </div>
+
+                    <form method="POST" action="/eliminar/{{ loop.index0 }}">
+                        <button type="submit" class="boto-eliminar">
+                            Eliminar
+                        </button>
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+</section>
 
 </body>
 </html>
