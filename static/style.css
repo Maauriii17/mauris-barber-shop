@@ -1,155 +1,514 @@
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#0f172a;
-    color:white;
+* {
+    box-sizing: border-box;
 }
 
-nav{
-    background:#000;
-    padding:20px;
-    text-align:center;
-    position:sticky;
-    top:0;
-    z-index:1000;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #111;
 }
 
-nav a{
-    color:white;
-    text-decoration:none;
-    margin:0 15px;
-    font-weight:bold;
-    transition:0.3s;
+nav {
+    background: #111;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 8%;
 }
 
-nav a:hover{
-    color:#facc15;
+.logo {
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
-.hero{
-    text-align:center;
-    padding:60px 20px;
-    background:linear-gradient(to bottom,#111827,#1e3a8a);
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
 }
 
-.hero-img{
-    width:700px;
-    max-width:90%;
-    height:350px;
-    object-fit:cover;
-    border-radius:20px;
-    display:block;
-    margin:0 auto 30px auto;
-    box-shadow:0 8px 25px rgba(0,0,0,0.4);
+.hero {
+    min-height: 70vh;
+    background: linear-gradient(135deg, #111, #2b2b2b);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 60px 8%;
 }
 
-.hero h1{
-    font-size:60px;
-    margin-bottom:10px;
+.hero-text {
+    flex: 1;
 }
 
-.hero p{
-    font-size:20px;
-    margin-bottom:30px;
+.hero h1 {
+    font-size: 64px;
+    margin: 10px 0 20px;
 }
 
-.btn{
-    display:inline-block;
-    padding:15px 30px;
-    margin:10px;
-    background:#2563eb;
-    color:white;
-    text-decoration:none;
-    border-radius:10px;
-    font-weight:bold;
-    transition:0.3s;
+.descripcio {
+    font-size: 20px;
+    line-height: 1.6;
+    max-width: 550px;
 }
 
-.btn:hover{
-    background:#1d4ed8;
+.petit-titol {
+    font-size: 14px;
+    letter-spacing: 3px;
+    font-weight: bold;
+    color: #d4af37;
 }
 
-.btn2{
-    display:inline-block;
-    padding:15px 30px;
-    margin:10px;
-    background:#facc15;
-    color:black;
-    text-decoration:none;
-    border-radius:10px;
-    font-weight:bold;
-    transition:0.3s;
+.fosc {
+    color: #444;
 }
 
-.btn2:hover{
-    background:#eab308;
+.hero-image {
+    flex: 1;
+    text-align: center;
 }
 
-.caixa{
-    width:85%;
-    max-width:1000px;
-    margin:40px auto;
-    background:white;
-    color:black;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+.hero-image img {
+    width: 100%;
+    max-width: 520px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
-.caixa h2{
-    text-align:center;
-    margin-bottom:30px;
+.hero-botons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.servei{
-    background:#f3f4f6;
-    padding:20px;
-    margin:15px 0;
-    border-radius:12px;
-    transition:0.3s;
+.boto-principal {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    background: #d4af37;
+    color: #111;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
 }
 
-.servei:hover{
-    transform:translateY(-3px);
+.boto-principal:hover {
+    background: #e1c15a;
 }
 
-.servei h3{
-    margin:0;
+.boto-secundari {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 28px;
+    border: 1px solid white;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
 }
 
-.servei p{
-    font-size:18px;
-    font-weight:bold;
+.boto-secundari:hover {
+    background: white;
+    color: #111;
 }
 
-.cita{
-    background:#f3f4f6;
-    padding:20px;
-    margin:15px 0;
-    border-radius:12px;
+.serveis {
+    padding: 70px 8%;
+    text-align: center;
+    background: white;
 }
 
-#calendar{
-    max-width:1000px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:15px;
+.serveis h2 {
+    font-size: 40px;
+    margin-bottom: 40px;
 }
 
-.fc{
-    color:black;
+.serveis-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
-.fc-toolbar-title{
-    font-size:24px;
+.servei {
+    background: #f7f7f7;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-.fc-button{
-    background:#2563eb !important;
-    border:none !important;
+.servei h3 {
+    margin-top: 0;
 }
 
-.fc-button:hover{
-    background:#1d4ed8 !important;
+.servei p {
+    color: #555;
+    line-height: 1.5;
+}
+
+.servei-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.servei a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.automatitzacio {
+    background: #171717;
+    color: white;
+    text-align: center;
+    padding: 70px 20%;
+}
+
+.automatitzacio h2 {
+    font-size: 40px;
+}
+
+.automatitzacio p {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #ddd;
+}
+
+footer {
+    background: #0b0b0b;
+    color: white;
+    text-align: center;
+    padding: 35px;
+}
+
+footer a {
+    color: #d4af37;
+}
+
+.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #111, #2b2b2b);
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+.tornar-inici {
+    width: 100%;
+    max-width: 450px;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 15px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.login-card h1 {
+    margin-top: 5px;
+    font-size: 34px;
+}
+
+.login-text {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.boto-login {
+    width: 100%;
+}
+
+.error-login {
+    background: #ffe3e3;
+    color: #a40000;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.reserva-section {
+    padding: 60px 8%;
+    min-height: calc(100vh - 70px);
+    background: #f4f4f4;
+}
+
+.reserva-card {
+    max-width: 850px;
+    margin: auto;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.reserva-card h1 {
+    font-size: 40px;
+    margin: 5px 0 10px;
+}
+
+.reserva-text {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.formulari-reserva {
+    display: grid;
+    gap: 10px;
+}
+
+.formulari-reserva label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.formulari-reserva input,
+.formulari-reserva select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+
+.hores-container {
+    margin-top: 35px;
+}
+
+.hores-container h2 {
+    margin-bottom: 10px;
+}
+
+#missatge-dia {
+    color: #666;
+}
+
+.hores-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.hores-grid button {
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.hora-disponible {
+    background: white;
+    color: #111;
+}
+
+.hora-disponible:hover {
+    border-color: #d4af37;
+}
+
+.hora-seleccionada {
+    background: #d4af37;
+    border-color: #d4af37;
+    font-weight: bold;
+}
+
+.hora-ocupada {
+    background: #e6e6e6;
+    color: #999;
+    cursor: not-allowed !important;
+}
+
+.confirmar-reserva {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+}
+
+.missatge-error {
+    margin-top: 25px;
+    padding: 15px;
+    background: #ffe3e3;
+    color: #a40000;
+    border-radius: 8px;
+}
+
+.reserva-correcta {
+    margin-top: 25px;
+    background: #e5f7e9;
+    color: #155724;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.panel-section {
+    max-width: 1000px;
+    margin: auto;
+    padding: 60px 8%;
+}
+
+.panel-header {
+    margin-bottom: 35px;
+}
+
+.panel-header h1 {
+    font-size: 42px;
+    margin: 5px 0 10px;
+}
+
+.panel-header p {
+    color: #666;
+}
+
+.sense-reserves {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+.reserves-list {
+    display: grid;
+    gap: 15px;
+}
+
+.reserva-barber {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    gap: 25px;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+.reserva-data {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.data-reserva {
+    color: #666;
+}
+
+.hora-reserva {
+    font-size: 28px;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.reserva-detalls h3 {
+    margin: 0 0 10px;
+}
+
+.reserva-detalls p {
+    margin: 5px 0;
+}
+
+.boto-eliminar {
+    background: #b3261e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.boto-eliminar:hover {
+    background: #8e1c17;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-size: 45px;
+    }
+
+    .hero-botons {
+        justify-content: center;
+    }
+
+    .serveis-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .reserva-barber {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .serveis-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 50px 6%;
+    }
+
+    .hero-image img {
+        height: 280px;
+    }
+
+    .automatitzacio {
+        padding: 50px 8%;
+    }
+
+    .reserva-section {
+        padding: 30px 5%;
+    }
+
+    .reserva-card {
+        padding: 25px;
+    }
+
+    .hores-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .login-card {
+        padding: 30px 25px;
+    }
 }
