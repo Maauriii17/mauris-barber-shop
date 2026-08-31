@@ -38,6 +38,47 @@ def ara_madrid():
     return datetime.now(ZONA_HORARIA)
 
 
+def minuts_hora(hora):
+    hores, minuts = hora.split(":")
+    return int(hores) * 60 + int(minuts)
+
+
+def obtenir_hores_properes(dia, hora_demanada):
+    ara = ara_madrid()
+    avui = ara.date()
+
+    dia_seleccionat = date.fromisoformat(dia)
+
+    disponibles = []
+
+    for hora in HORES:
+        ocupada = False
+
+        for cita in cites:
+            if cita["dia"] == dia and cita["hora"] == hora:
+                ocupada = True
+                break
+
+        if ocupada:
+            continue
+
+        if dia_seleccionat == avui:
+            hora_possible = datetime.strptime(hora, "%H:%M").time()
+
+            if hora_possible <= ara.time():
+                continue
+
+        disponibles.append(hora)
+
+    hora_base = minuts_hora(hora_demanada)
+
+    disponibles.sort(
+        key=lambda h: abs(minuts_hora(h) - hora_base)
+    )
+
+    return disponibles[:3]
+
+
 @app.route("/")
 def home():
     return render_template("index.html", serveis=SERVEIS)
@@ -191,29 +232,15 @@ def api_reservar():
     for cita in cites:
         if cita["dia"] == dia and cita["hora"] == hora:
 
-            lliures = []
-
-            for h in HORES:
-                ocupada = False
-
-                for altra_cita in cites:
-                    if altra_cita["dia"] == dia and altra_cita["hora"] == h:
-                        ocupada = True
-                        break
-
-                if not ocupada:
-                    if dia_seleccionat == avui:
-                        hora_possible = datetime.strptime(h, "%H:%M").time()
-
-                        if hora_possible <= ara.time():
-                            continue
-
-                    lliures.append(h)
+            suggeriments = obtenir_hores_properes(
+                dia,
+                hora
+            )
 
             return jsonify({
                 "ok": False,
                 "missatge": "Aquesta hora ja està ocupada.",
-                "suggeriments": lliures[:3]
+                "suggeriments": suggeriments
             })
 
     cites.append({
