@@ -25,14 +25,93 @@
 <section class="panel-section">
 
     <div class="panel-header">
-        <p class="petit-titol">PANEL PRIVAT</p>
 
-        <h1>Gestió de reserves</h1>
+        <p class="petit-titol">
+            PANEL PRIVAT
+        </p>
+
+        <h1>
+            Gestió de reserves
+        </h1>
 
         <p>
             Consulta i organitza totes les cites de la barberia.
         </p>
+
     </div>
+
+
+    <div class="resum-panel">
+
+        <div class="resum-targeta">
+
+            <p class="resum-etiqueta">
+                RESERVES PRÒXIMES
+            </p>
+
+            <h2>
+                {{ total_proximes }}
+            </h2>
+
+            <p>
+                Cites pendents
+            </p>
+
+        </div>
+
+
+        <div class="resum-targeta">
+
+            <p class="resum-etiqueta">
+                INGRESSOS PREVISTOS
+            </p>
+
+            <h2>
+                {{ ingressos_previstos }} €
+            </h2>
+
+            <p>
+                De les reserves pendents
+            </p>
+
+        </div>
+
+
+        <div class="resum-targeta">
+
+            <p class="resum-etiqueta">
+                CITES D'AVUI
+            </p>
+
+            <h2>
+                {{ total_avui }}
+            </h2>
+
+            <p>
+                Reserves per avui
+            </p>
+
+        </div>
+
+
+        <div class="resum-targeta">
+
+            <p class="resum-etiqueta">
+                INGRESSOS D'AVUI
+            </p>
+
+            <h2>
+                {{ ingressos_avui }} €
+            </h2>
+
+            <p>
+                Previsió del dia
+            </p>
+
+        </div>
+
+    </div>
+
 
 
     {% if cites_avui|length > 0 %}
@@ -40,14 +119,23 @@
         <div class="bloc-reserves bloc-avui">
 
             <div class="capcalera-grup">
+
                 <div>
-                    <p class="etiqueta-grup">AVUI</p>
-                    <h2>Cites d'avui</h2>
+
+                    <p class="etiqueta-grup">
+                        AVUI
+                    </p>
+
+                    <h2>
+                        Cites d'avui
+                    </h2>
+
                 </div>
 
                 <span class="comptador-reserves">
                     {{ cites_avui|length }}
                 </span>
+
             </div>
 
 
@@ -122,6 +210,7 @@
             <div class="capcalera-grup">
 
                 <div>
+
                     <p class="etiqueta-grup">
                         PRÒXIMAMENT
                     </p>
@@ -129,6 +218,7 @@
                     <h2>
                         Properes cites
                     </h2>
+
                 </div>
 
                 <span class="comptador-reserves">
@@ -209,6 +299,7 @@
             <div class="capcalera-grup">
 
                 <div>
+
                     <p class="etiqueta-grup">
                         HISTORIAL
                     </p>
@@ -216,6 +307,7 @@
                     <h2>
                         Cites passades
                     </h2>
+
                 </div>
 
                 <span class="comptador-reserves">
