@@ -25,32 +25,28 @@
 
     <div class="panel-header">
         <p class="petit-titol">PANEL PRIVAT</p>
-        <h1>Reserves</h1>
-        <p>Consulta i gestiona les cites de la barberia.</p>
+        <h1>Gestió de reserves</h1>
+        <p>Consulta les cites organitzades per dia.</p>
     </div>
 
-    {% if cites|length == 0 %}
+    {% if cites_avui|length > 0 %}
 
-        <div class="sense-reserves">
-            <h2>No tens reserves encara</h2>
-            <p>Les noves cites apareixeran aquí automàticament.</p>
-        </div>
+        <div class="bloc-reserves">
 
-    {% else %}
+            <h2 class="titol-grup">
+                Cites d'avui
+            </h2>
 
-        <div class="reserves-list">
+            {% for cita in cites_avui %}
 
-            {% for cita in cites %}
-
-                <div class="reserva-barber">
+                <div class="reserva-barber reserva-avui">
 
                     <div class="reserva-data">
-                        <span class="data-reserva">{{ cita.dia }}</span>
+                        <span class="data-reserva">Avui</span>
                         <span class="hora-reserva">{{ cita.hora }}</span>
                     </div>
 
                     <div class="reserva-detalls">
-
                         <h3>{{ cita.nom }}</h3>
 
                         <p>
@@ -62,10 +58,9 @@
                             <strong>Preu:</strong>
                             {{ cita.preu }} €
                         </p>
-
                     </div>
 
-                    <form method="POST" action="/eliminar/{{ loop.index0 }}">
+                    <form method="POST" action="/eliminar/{{ cita.index }}">
                         <button type="submit" class="boto-eliminar">
                             Eliminar
                         </button>
@@ -75,6 +70,108 @@
 
             {% endfor %}
 
+        </div>
+
+    {% endif %}
+
+
+    {% if cites_futures|length > 0 %}
+
+        <div class="bloc-reserves">
+
+            <h2 class="titol-grup">
+                Properes cites
+            </h2>
+
+            {% for cita in cites_futures %}
+
+                <div class="reserva-barber">
+
+                    <div class="reserva-data">
+                        <span class="data-reserva">{{ cita.dia }}</span>
+                        <span class="hora-reserva">{{ cita.hora }}</span>
+                    </div>
+
+                    <div class="reserva-detalls">
+                        <h3>{{ cita.nom }}</h3>
+
+                        <p>
+                            <strong>Servei:</strong>
+                            {{ cita.servei }}
+                        </p>
+
+                        <p>
+                            <strong>Preu:</strong>
+                            {{ cita.preu }} €
+                        </p>
+                    </div>
+
+                    <form method="POST" action="/eliminar/{{ cita.index }}">
+                        <button type="submit" class="boto-eliminar">
+                            Eliminar
+                        </button>
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if cites_passades|length > 0 %}
+
+        <div class="bloc-reserves">
+
+            <h2 class="titol-grup">
+                Cites passades
+            </h2>
+
+            {% for cita in cites_passades %}
+
+                <div class="reserva-barber reserva-passada">
+
+                    <div class="reserva-data">
+                        <span class="data-reserva">{{ cita.dia }}</span>
+                        <span class="hora-reserva">{{ cita.hora }}</span>
+                    </div>
+
+                    <div class="reserva-detalls">
+                        <h3>{{ cita.nom }}</h3>
+
+                        <p>
+                            <strong>Servei:</strong>
+                            {{ cita.servei }}
+                        </p>
+
+                        <p>
+                            <strong>Preu:</strong>
+                            {{ cita.preu }} €
+                        </p>
+                    </div>
+
+                    <form method="POST" action="/eliminar/{{ cita.index }}">
+                        <button type="submit" class="boto-eliminar">
+                            Eliminar
+                        </button>
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    {% if cites_avui|length == 0 and cites_futures|length == 0 and cites_passades|length == 0 %}
+
+        <div class="sense-reserves">
+            <h2>No tens reserves encara</h2>
+            <p>Les noves cites apareixeran aquí automàticament.</p>
         </div>
 
     {% endif %}
