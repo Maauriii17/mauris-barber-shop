@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Accés barber - Mauri's Barber Shop</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="login-page">
+
+<div class="login-container">
+
+    <a href="/" class="tornar-inici">← Tornar a l'inici</a>
+
+    <div class="login-card">
+
+        <p class="petit-titol">ACCÉS PRIVAT</p>
+
+        <h1>Panel del barber</h1>
+
+        <p class="login-text">
+            Introdueix la contrasenya per accedir a la gestió de reserves.
+        </p>
+
+        <form method="POST">
+
+            <input
+                type="password"
+                name="contrasenya"
+                placeholder="Contrasenya"
+                required
+            >
+
+            {% if error %}
+                <p class="error-login">{{ error }}</p>
+            {% endif %}
+
+            <button type="submit" class="boto-principal boto-login">
+                Entrar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
