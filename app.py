@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 app.secret_key = "mauris-barber-shop-secret"
@@ -7,6 +8,8 @@ app.secret_key = "mauris-barber-shop-secret"
 cites = []
 
 CONTRASENYA_BARBER = "barber123"
+
+ZONA_HORARIA = ZoneInfo("Europe/Madrid")
 
 SERVEIS = {
     "Tall de cabell": 15,
@@ -29,6 +32,10 @@ HORES = [
     "18:00",
     "18:30"
 ]
+
+
+def ara_madrid():
+    return datetime.now(ZONA_HORARIA)
 
 
 @app.route("/")
@@ -96,7 +103,8 @@ def api_hores(dia):
     except ValueError:
         return jsonify([])
 
-    avui = date.today()
+    ara = ara_madrid()
+    avui = ara.date()
 
     if dia_seleccionat < avui:
         return jsonify([])
@@ -108,8 +116,6 @@ def api_hores(dia):
             ocupades.append(cita["hora"])
 
     resultat = []
-
-    ara = datetime.now()
 
     for hora in HORES:
         passada = False
@@ -131,7 +137,7 @@ def api_hores(dia):
 
 @app.route("/api/reservar", methods=["POST"])
 def api_reservar():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     nom = data.get("nom", "").strip()
     servei = data.get("servei", "").strip()
@@ -152,7 +158,8 @@ def api_reservar():
             "missatge": "La data seleccionada no és correcta."
         })
 
-    avui = date.today()
+    ara = ara_madrid()
+    avui = ara.date()
 
     if dia_seleccionat < avui:
         return jsonify({
@@ -173,7 +180,6 @@ def api_reservar():
         })
 
     if dia_seleccionat == avui:
-        ara = datetime.now()
         hora_cita = datetime.strptime(hora, "%H:%M").time()
 
         if hora_cita <= ara.time():
@@ -199,7 +205,7 @@ def api_reservar():
                     if dia_seleccionat == avui:
                         hora_possible = datetime.strptime(h, "%H:%M").time()
 
-                        if hora_possible <= datetime.now().time():
+                        if hora_possible <= ara.time():
                             continue
 
                     lliures.append(h)
