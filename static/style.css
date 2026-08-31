@@ -405,7 +405,7 @@ footer a {
 }
 
 .panel-header {
-    margin-bottom: 45px;
+    margin-bottom: 35px;
 }
 
 .panel-header h1 {
@@ -415,6 +415,45 @@ footer a {
 
 .panel-header p {
     color: #666;
+}
+
+
+/* RESUM DEL PANEL */
+
+.resum-panel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 50px;
+}
+
+.resum-targeta {
+    background: white;
+    border-radius: 15px;
+    padding: 22px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    border-top: 4px solid #d4af37;
+}
+
+.resum-etiqueta {
+    margin: 0 0 12px;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    font-weight: bold;
+    color: #777;
+}
+
+.resum-targeta h2 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    color: #111;
+}
+
+.resum-targeta p:last-child {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 
@@ -466,7 +505,7 @@ footer a {
 }
 
 
-/* LLISTA RESERVES */
+/* LLISTA DE RESERVES */
 
 .reserves-list {
     display: grid;
@@ -608,6 +647,10 @@ footer a {
         display: none;
     }
 
+    .resum-panel {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .reserva-barber {
         grid-template-columns: 1fr;
     }
@@ -657,6 +700,10 @@ footer a {
 
     .panel-header h1 {
         font-size: 34px;
+    }
+
+    .resum-panel {
+        grid-template-columns: 1fr;
     }
 
     .capcalera-grup h2 {
