@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
-from datetime import date
+from datetime import date, datetime
 
 app = Flask(__name__)
 app.secret_key = "mauris-barber-shop-secret"
@@ -96,7 +96,9 @@ def api_hores(dia):
     except ValueError:
         return jsonify([])
 
-    if dia_seleccionat < date.today():
+    avui = date.today()
+
+    if dia_seleccionat < avui:
         return jsonify([])
 
     ocupades = []
@@ -107,10 +109,21 @@ def api_hores(dia):
 
     resultat = []
 
+    ara = datetime.now()
+
     for hora in HORES:
+        passada = False
+
+        if dia_seleccionat == avui:
+            hora_cita = datetime.strptime(hora, "%H:%M").time()
+
+            if hora_cita <= ara.time():
+                passada = True
+
         resultat.append({
             "hora": hora,
-            "ocupada": hora in ocupades
+            "ocupada": hora in ocupades,
+            "passada": passada
         })
 
     return jsonify(resultat)
@@ -139,7 +152,9 @@ def api_reservar():
             "missatge": "La data seleccionada no és correcta."
         })
 
-    if dia_seleccionat < date.today():
+    avui = date.today()
+
+    if dia_seleccionat < avui:
         return jsonify({
             "ok": False,
             "missatge": "No pots reservar una cita en un dia que ja ha passat."
@@ -157,6 +172,16 @@ def api_reservar():
             "missatge": "L'hora seleccionada no és correcta."
         })
 
+    if dia_seleccionat == avui:
+        ara = datetime.now()
+        hora_cita = datetime.strptime(hora, "%H:%M").time()
+
+        if hora_cita <= ara.time():
+            return jsonify({
+                "ok": False,
+                "missatge": "Aquesta hora ja ha passat. Tria una hora posterior."
+            })
+
     for cita in cites:
         if cita["dia"] == dia and cita["hora"] == hora:
 
@@ -171,6 +196,12 @@ def api_reservar():
                         break
 
                 if not ocupada:
+                    if dia_seleccionat == avui:
+                        hora_possible = datetime.strptime(h, "%H:%M").time()
+
+                        if hora_possible <= datetime.now().time():
+                            continue
+
                     lliures.append(h)
 
             return jsonify({
