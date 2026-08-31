@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Reserva</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <meta name="theme-color" content="#0f172a">
+
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/">Inici</a>
+    <a href="/reserva">Reservar</a>
+
+</nav>
+
+<div class="caixa">
+
+    <h1>Calendari de reserves</h1>
+
+    <div id="calendar"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    let calendarEl = document.getElementById('calendar');
+
+    let calendar = new FullCalendar.Calendar(calendarEl, {
+
+        initialView: 'dayGridMonth',
+
+        selectable: true,
+
+        events: function(fetchInfo, successCallback) {
+
+            fetch("/api/cites")
+                .then(res => res.json())
+                .then(data => {
+
+                    successCallback(data.map(e => ({
+                        title: e.title,
+                        start: e.start
+                    })));
+
+                });
+        },
+
+        dateClick: function(info) {
+
+            let nom = prompt("Nom del client:");
+
+            let servei = prompt(
+                "Servei:\n- Tall\n- Barba\n- Tall + barba"
+            );
+
+            let hora = prompt("Hora (10:00, 11:00...)");
+
+            if (!nom || !hora || !servei) return;
+
+            fetch("/api/reservar", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    title: nom,
+                    service: servei,
+                    start: info.dateStr + "T" + hora
+
+                })
+
+            })
+
+            .then(r => r.json())
+
+            .then(data => {
+
+                if(data.ok){
+
+                    alert("Reserva creada!");
+
+                    calendar.refetchEvents();
+
+                } else {
+
+                    alert(
+                        "Hora ocupada.\n\n" +
+                        "Hores disponibles:\n" +
+                        data.suggestions.join(", ")
+                    );
+
+                }
+
+            });
+
+        }
+
+    });
+
+    calendar.render();
+
+});
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/sw.js");
+}
+</script>
+
+</body>
+</html>
