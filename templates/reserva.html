@@ -30,17 +30,50 @@
         <h1>Reserva la teva cita</h1>
 
         <p class="reserva-text">
-            Tria el servei, selecciona el dia i consulta les hores disponibles.
+            Pots reservar manualment o utilitzar l'assistent amb IA.
         </p>
+
+        <div class="assistent-ia">
+
+            <h2>Assistent amb IA</h2>
+
+            <p>
+                Explica quan vols venir i quin servei necessites.
+            </p>
+
+            <textarea
+                id="peticio-ia"
+                placeholder="Exemple: Vull tallar-me el cabell demà a la tarda cap a les 17"
+            ></textarea>
+
+            <button
+                type="button"
+                class="boto-principal boto-ia"
+                onclick="consultarIA()"
+            >
+                Buscar cita amb IA
+            </button>
+
+            <div id="resultat-ia"></div>
+
+        </div>
+
+
+        <div class="separador">
+            <span>o reserva manualment</span>
+        </div>
+
 
         <div class="formulari-reserva">
 
             <label for="nom">Nom</label>
+
             <input
                 type="text"
                 id="nom"
                 placeholder="Escriu el teu nom"
             >
+
 
             <label for="servei">Servei</label>
 
@@ -59,6 +92,7 @@
                 {% endfor %}
 
             </select>
+
 
             <label for="dia">Dia</label>
 
@@ -112,9 +146,7 @@ const diaActual = String(
     avui.getDate()
 ).padStart(2, "0");
 
-
 diaInput.min = `${any}-${mes}-${diaActual}`;
-
 
 diaInput.addEventListener(
     "change",
@@ -122,12 +154,11 @@ diaInput.addEventListener(
 );
 
 
-function carregarHores() {
+function carregarHores(horaQueVolemSeleccionar = null) {
 
     const diaSeleccionat = diaInput.value;
 
     horaSeleccionada = null;
-
     horesDiv.innerHTML = "";
 
     if (!diaSeleccionat) {
@@ -158,7 +189,6 @@ function carregarHores() {
 
                 return;
             }
-
 
             missatgeDia.style.display = "none";
 
@@ -204,36 +234,32 @@ function carregarHores() {
                         "hora-disponible"
                     );
 
-
                     boto.addEventListener(
                         "click",
                         function () {
 
-                            document
-                                .querySelectorAll(
-                                    ".hora-disponible"
-                                )
-                                .forEach(
-                                    b =>
-                                        b.classList.remove(
-                                            "hora-seleccionada"
-                                        )
-                                );
-
-
-                            boto.classList.add(
-                                "hora-seleccionada"
+                            seleccionarHora(
+                                boto,
+                                element.hora
                             );
-
-
-                            horaSeleccionada =
-                                element.hora;
 
                         }
                     );
 
-                }
 
+                    if (
+                        horaQueVolemSeleccionar &&
+                        element.hora === horaQueVolemSeleccionar
+                    ) {
+
+                        seleccionarHora(
+                            boto,
+                            element.hora
+                        );
+
+                    }
+
+                }
 
                 horesDiv.appendChild(boto);
 
@@ -243,26 +269,168 @@ function carregarHores() {
             const confirmar =
                 document.createElement("button");
 
-
             confirmar.textContent =
                 "Confirmar reserva";
-
 
             confirmar.classList.add(
                 "boto-principal",
                 "confirmar-reserva"
             );
 
-
             confirmar.addEventListener(
                 "click",
                 confirmarReserva
             );
 
-
             horesDiv.appendChild(confirmar);
 
         });
+
+}
+
+
+function seleccionarHora(boto, hora) {
+
+    document
+        .querySelectorAll(".hora-disponible")
+        .forEach(
+            b =>
+                b.classList.remove(
+                    "hora-seleccionada"
+                )
+        );
+
+    boto.classList.add(
+        "hora-seleccionada"
+    );
+
+    horaSeleccionada = hora;
+}
+
+
+function consultarIA() {
+
+    const peticio =
+        document
+            .getElementById("peticio-ia")
+            .value
+            .trim();
+
+    const resultatIA =
+        document.getElementById("resultat-ia");
+
+
+    if (!peticio) {
+
+        resultatIA.innerHTML =
+            "<p class='missatge-error'>Escriu què necessites.</p>";
+
+        return;
+    }
+
+
+    resultatIA.innerHTML =
+        "<p class='ia-carregant'>La IA està buscant la millor cita...</p>";
+
+
+    fetch("/api/ia", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            peticio: peticio
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (!data.ok) {
+
+            resultatIA.innerHTML =
+                `<p class="missatge-error">
+                    ${data.missatge}
+                </p>`;
+
+            return;
+        }
+
+
+        if (data.servei) {
+
+            document.getElementById("servei").value =
+                data.servei;
+
+        }
+
+
+        document.getElementById("dia").value =
+            data.dia;
+
+
+        carregarHores(
+            data.hora
+        );
+
+
+        let alternatives = "";
+
+        if (
+            data.alternatives &&
+            data.alternatives.length > 0
+        ) {
+
+            alternatives =
+                `<p>
+                    <strong>Alternatives:</strong>
+                    ${data.alternatives.join(", ")}
+                </p>`;
+
+        }
+
+
+        resultatIA.innerHTML =
+            `<div class="ia-resultat">
+
+                <h3>✨ Recomanació de la IA</h3>
+
+                <p>
+                    <strong>Servei:</strong>
+                    ${data.servei || "Selecciona el servei"}
+                </p>
+
+                <p>
+                    <strong>Dia:</strong>
+                    ${data.dia}
+                </p>
+
+                <p>
+                    <strong>Hora recomanada:</strong>
+                    ${data.hora}
+                </p>
+
+                ${alternatives}
+
+                <p>
+                    La proposta s'ha seleccionat automàticament a la reserva.
+                </p>
+
+            </div>`;
+
+    })
+
+    .catch(() => {
+
+        resultatIA.innerHTML =
+            "<p class='missatge-error'>Hi ha hagut un error connectant amb la IA.</p>";
+
+    });
 
 }
 
@@ -275,18 +443,15 @@ function confirmarReserva() {
             .value
             .trim();
 
-
     const servei =
         document
             .getElementById("servei")
             .value;
 
-
     const dia =
         document
             .getElementById("dia")
             .value;
-
 
     resultat.innerHTML = "";
 
@@ -355,7 +520,6 @@ function confirmarReserva() {
 
                 </div>`;
 
-
             horaSeleccionada = null;
 
             carregarHores();
@@ -376,18 +540,15 @@ function confirmarReserva() {
                 text +=
                     "<br><br>Et proposem aquestes hores: ";
 
-
                 text +=
                     data.suggeriments.join(", ");
 
             }
 
-
             resultat.innerHTML =
                 `<p class="missatge-error">
                     ${text}
                 </p>`;
-
 
             carregarHores();
 
