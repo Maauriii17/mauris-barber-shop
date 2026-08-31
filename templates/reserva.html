@@ -36,23 +36,39 @@
         <div class="formulari-reserva">
 
             <label for="nom">Nom</label>
-            <input type="text" id="nom" placeholder="Escriu el teu nom">
+            <input
+                type="text"
+                id="nom"
+                placeholder="Escriu el teu nom"
+            >
 
             <label for="servei">Servei</label>
+
             <select id="servei">
-                <option value="">Selecciona un servei</option>
+
+                <option value="">
+                    Selecciona un servei
+                </option>
 
                 {% for servei, preu in serveis.items() %}
+
                     <option value="{{ servei }}">
                         {{ servei }} - {{ preu }} €
                     </option>
+
                 {% endfor %}
+
             </select>
 
             <label for="dia">Dia</label>
-            <input type="date" id="dia">
+
+            <input
+                type="date"
+                id="dia"
+            >
 
         </div>
+
 
         <div class="hores-container">
 
@@ -66,11 +82,13 @@
 
         </div>
 
+
         <div id="resultat-reserva"></div>
 
     </div>
 
 </section>
+
 
 <script>
 
@@ -79,16 +97,29 @@ let horaSeleccionada = null;
 const diaInput = document.getElementById("dia");
 const horesDiv = document.getElementById("hores");
 const resultat = document.getElementById("resultat-reserva");
+const missatgeDia = document.getElementById("missatge-dia");
+
 
 const avui = new Date();
+
 const any = avui.getFullYear();
-const mes = String(avui.getMonth() + 1).padStart(2, "0");
-const dia = String(avui.getDate()).padStart(2, "0");
 
-diaInput.min = `${any}-${mes}-${dia}`;
+const mes = String(
+    avui.getMonth() + 1
+).padStart(2, "0");
+
+const diaActual = String(
+    avui.getDate()
+).padStart(2, "0");
 
 
-diaInput.addEventListener("change", carregarHores);
+diaInput.min = `${any}-${mes}-${diaActual}`;
+
+
+diaInput.addEventListener(
+    "change",
+    carregarHores
+);
 
 
 function carregarHores() {
@@ -96,59 +127,138 @@ function carregarHores() {
     const diaSeleccionat = diaInput.value;
 
     horaSeleccionada = null;
+
     horesDiv.innerHTML = "";
-    resultat.innerHTML = "";
 
     if (!diaSeleccionat) {
+
+        missatgeDia.style.display = "block";
+
+        missatgeDia.textContent =
+            "Selecciona un dia per veure les hores disponibles.";
+
         return;
     }
 
+
     fetch(`/api/hores/${diaSeleccionat}`)
+
         .then(response => response.json())
+
         .then(hores => {
 
-            document.getElementById("missatge-dia").style.display = "none";
+            horesDiv.innerHTML = "";
+
+            if (hores.length === 0) {
+
+                missatgeDia.style.display = "block";
+
+                missatgeDia.textContent =
+                    "Aquest dia no té hores disponibles.";
+
+                return;
+            }
+
+
+            missatgeDia.style.display = "none";
+
 
             hores.forEach(element => {
 
-                const boto = document.createElement("button");
+                const boto =
+                    document.createElement("button");
 
-                boto.textContent = element.hora;
 
-                if (element.ocupada) {
+                if (element.passada) {
+
+                    boto.textContent =
+                        element.hora + " · Passada";
 
                     boto.disabled = true;
-                    boto.classList.add("hora-ocupada");
-                    boto.textContent = element.hora + " · Ocupada";
 
-                } else {
-
-                    boto.classList.add("hora-disponible");
-
-                    boto.addEventListener("click", function() {
-
-                        document
-                            .querySelectorAll(".hora-disponible")
-                            .forEach(b => b.classList.remove("hora-seleccionada"));
-
-                        boto.classList.add("hora-seleccionada");
-
-                        horaSeleccionada = element.hora;
-
-                    });
+                    boto.classList.add(
+                        "hora-ocupada"
+                    );
 
                 }
+
+                else if (element.ocupada) {
+
+                    boto.textContent =
+                        element.hora + " · Ocupada";
+
+                    boto.disabled = true;
+
+                    boto.classList.add(
+                        "hora-ocupada"
+                    );
+
+                }
+
+                else {
+
+                    boto.textContent =
+                        element.hora;
+
+                    boto.classList.add(
+                        "hora-disponible"
+                    );
+
+
+                    boto.addEventListener(
+                        "click",
+                        function () {
+
+                            document
+                                .querySelectorAll(
+                                    ".hora-disponible"
+                                )
+                                .forEach(
+                                    b =>
+                                        b.classList.remove(
+                                            "hora-seleccionada"
+                                        )
+                                );
+
+
+                            boto.classList.add(
+                                "hora-seleccionada"
+                            );
+
+
+                            horaSeleccionada =
+                                element.hora;
+
+                        }
+                    );
+
+                }
+
 
                 horesDiv.appendChild(boto);
 
             });
 
-            const confirmar = document.createElement("button");
 
-            confirmar.textContent = "Confirmar reserva";
-            confirmar.classList.add("boto-principal", "confirmar-reserva");
+            const confirmar =
+                document.createElement("button");
 
-            confirmar.addEventListener("click", confirmarReserva);
+
+            confirmar.textContent =
+                "Confirmar reserva";
+
+
+            confirmar.classList.add(
+                "boto-principal",
+                "confirmar-reserva"
+            );
+
+
+            confirmar.addEventListener(
+                "click",
+                confirmarReserva
+            );
+
 
             horesDiv.appendChild(confirmar);
 
@@ -159,19 +269,41 @@ function carregarHores() {
 
 function confirmarReserva() {
 
-    const nom = document.getElementById("nom").value.trim();
-    const servei = document.getElementById("servei").value;
-    const dia = document.getElementById("dia").value;
+    const nom =
+        document
+            .getElementById("nom")
+            .value
+            .trim();
+
+
+    const servei =
+        document
+            .getElementById("servei")
+            .value;
+
+
+    const dia =
+        document
+            .getElementById("dia")
+            .value;
+
 
     resultat.innerHTML = "";
 
-    if (!nom || !servei || !dia || !horaSeleccionada) {
+
+    if (
+        !nom ||
+        !servei ||
+        !dia ||
+        !horaSeleccionada
+    ) {
 
         resultat.innerHTML =
-            "<p class='missatge-error'>Completa totes les dades i selecciona una hora.</p>";
+            "<p class='missatge-error'>Completa totes les dades i selecciona una hora disponible.</p>";
 
         return;
     }
+
 
     fetch("/api/reservar", {
 
@@ -198,28 +330,64 @@ function confirmarReserva() {
 
             resultat.innerHTML =
                 `<div class="reserva-correcta">
+
                     <h3>Reserva confirmada</h3>
-                    <p>${nom}</p>
-                    <p>${servei}</p>
-                    <p>${dia} a les ${horaSeleccionada}</p>
+
+                    <p>
+                        <strong>Nom:</strong>
+                        ${nom}
+                    </p>
+
+                    <p>
+                        <strong>Servei:</strong>
+                        ${servei}
+                    </p>
+
+                    <p>
+                        <strong>Data:</strong>
+                        ${dia}
+                    </p>
+
+                    <p>
+                        <strong>Hora:</strong>
+                        ${horaSeleccionada}
+                    </p>
+
                 </div>`;
+
+
+            horaSeleccionada = null;
 
             carregarHores();
 
-        } else {
+        }
 
-            let text = data.missatge;
+        else {
 
-            if (data.suggeriments && data.suggeriments.length > 0) {
+            let text =
+                data.missatge;
 
-                text += "<br><br>Et proposem aquestes hores: ";
 
-                text += data.suggeriments.join(", ");
+            if (
+                data.suggeriments &&
+                data.suggeriments.length > 0
+            ) {
+
+                text +=
+                    "<br><br>Et proposem aquestes hores: ";
+
+
+                text +=
+                    data.suggeriments.join(", ");
 
             }
 
+
             resultat.innerHTML =
-                `<p class="missatge-error">${text}</p>`;
+                `<p class="missatge-error">
+                    ${text}
+                </p>`;
+
 
             carregarHores();
 
