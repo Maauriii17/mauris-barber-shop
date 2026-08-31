@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = "mauris-barber-shop-secret"
@@ -43,11 +44,9 @@ def login_client():
 
 @app.route("/login/barber", methods=["GET", "POST"])
 def login_barber():
-
     error = None
 
     if request.method == "POST":
-
         contrasenya = request.form.get("contrasenya")
 
         if contrasenya == CONTRASENYA_BARBER:
@@ -67,7 +66,6 @@ def logout():
 
 @app.route("/reserva")
 def reserva():
-
     if session.get("rol") != "client":
         return redirect("/")
 
@@ -80,7 +78,6 @@ def reserva():
 
 @app.route("/api/cites")
 def api_cites():
-
     resultat = []
 
     for cita in cites:
@@ -94,6 +91,13 @@ def api_cites():
 
 @app.route("/api/hores/<dia>")
 def api_hores(dia):
+    try:
+        dia_seleccionat = date.fromisoformat(dia)
+    except ValueError:
+        return jsonify([])
+
+    if dia_seleccionat < date.today():
+        return jsonify([])
 
     ocupades = []
 
@@ -114,7 +118,6 @@ def api_hores(dia):
 
 @app.route("/api/reservar", methods=["POST"])
 def api_reservar():
-
     data = request.get_json()
 
     nom = data.get("nom", "").strip()
@@ -126,6 +129,20 @@ def api_reservar():
         return jsonify({
             "ok": False,
             "missatge": "Falten dades per completar la reserva."
+        })
+
+    try:
+        dia_seleccionat = date.fromisoformat(dia)
+    except ValueError:
+        return jsonify({
+            "ok": False,
+            "missatge": "La data seleccionada no és correcta."
+        })
+
+    if dia_seleccionat < date.today():
+        return jsonify({
+            "ok": False,
+            "missatge": "No pots reservar una cita en un dia que ja ha passat."
         })
 
     if servei not in SERVEIS:
@@ -141,13 +158,11 @@ def api_reservar():
         })
 
     for cita in cites:
-
         if cita["dia"] == dia and cita["hora"] == hora:
 
             lliures = []
 
             for h in HORES:
-
                 ocupada = False
 
                 for altra_cita in cites:
@@ -180,7 +195,6 @@ def api_reservar():
 
 @app.route("/panelbarber")
 def panelbarber():
-
     if session.get("rol") != "barber":
         return redirect("/login/barber")
 
@@ -197,7 +211,6 @@ def panelbarber():
 
 @app.route("/eliminar/<int:index>", methods=["POST"])
 def eliminar_reserva(index):
-
     if session.get("rol") != "barber":
         return redirect("/login/barber")
 
