@@ -204,6 +204,7 @@ def api_reservar():
 
     try:
         dia_seleccionat = date.fromisoformat(dia)
+
     except ValueError:
         return jsonify({
             "ok": False,
@@ -322,11 +323,29 @@ def panelbarber():
         reverse=True
     )
 
+    cites_proximes = cites_avui + cites_futures
+
+    total_proximes = len(cites_proximes)
+
+    ingressos_previstos = sum(
+        cita["preu"] for cita in cites_proximes
+    )
+
+    total_avui = len(cites_avui)
+
+    ingressos_avui = sum(
+        cita["preu"] for cita in cites_avui
+    )
+
     return render_template(
         "panelbarber.html",
         cites_avui=cites_avui,
         cites_futures=cites_futures,
-        cites_passades=cites_passades
+        cites_passades=cites_passades,
+        total_proximes=total_proximes,
+        ingressos_previstos=ingressos_previstos,
+        total_avui=total_avui,
+        ingressos_avui=ingressos_avui
     )
 
 
