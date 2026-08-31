@@ -9,6 +9,9 @@ body {
     color: #111;
 }
 
+
+/* NAV */
+
 nav {
     background: #111;
     color: white;
@@ -28,6 +31,9 @@ nav {
     text-decoration: none;
     margin-left: 25px;
 }
+
+
+/* HOME */
 
 .hero {
     min-height: 70vh;
@@ -87,6 +93,9 @@ nav {
     flex-wrap: wrap;
 }
 
+
+/* BOTONS */
+
 .boto-principal {
     display: inline-block;
     margin-top: 20px;
@@ -120,6 +129,9 @@ nav {
     background: white;
     color: #111;
 }
+
+
+/* SERVEIS */
 
 .serveis {
     padding: 70px 8%;
@@ -167,6 +179,9 @@ nav {
     font-weight: bold;
 }
 
+
+/* AUTOMATITZACIO */
+
 .automatitzacio {
     background: #171717;
     color: white;
@@ -184,6 +199,9 @@ nav {
     color: #ddd;
 }
 
+
+/* FOOTER */
+
 footer {
     background: #0b0b0b;
     color: white;
@@ -194,6 +212,9 @@ footer {
 footer a {
     color: #d4af37;
 }
+
+
+/* LOGIN BARBER */
 
 .login-page {
     min-height: 100vh;
@@ -256,6 +277,9 @@ footer a {
     border-radius: 8px;
     margin-top: 15px;
 }
+
+
+/* RESERVA CLIENT */
 
 .reserva-section {
     padding: 60px 8%;
@@ -371,14 +395,17 @@ footer a {
     border-radius: 10px;
 }
 
+
+/* PANEL BARBER */
+
 .panel-section {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
     padding: 60px 8%;
 }
 
 .panel-header {
-    margin-bottom: 35px;
+    margin-bottom: 45px;
 }
 
 .panel-header h1 {
@@ -390,13 +417,56 @@ footer a {
     color: #666;
 }
 
-.sense-reserves {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+
+/* GRUPS DE RESERVES */
+
+.bloc-reserves {
+    margin-bottom: 45px;
 }
+
+.capcalera-grup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.capcalera-grup h2 {
+    margin: 5px 0 0;
+    font-size: 26px;
+}
+
+.etiqueta-grup {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #777;
+}
+
+.comptador-reserves {
+    min-width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: white;
+    font-weight: bold;
+}
+
+.bloc-avui .comptador-reserves {
+    background: #d4af37;
+    color: #111;
+}
+
+.bloc-passades .comptador-reserves {
+    background: #777;
+}
+
+
+/* LLISTA RESERVES */
 
 .reserves-list {
     display: grid;
@@ -412,6 +482,24 @@ footer a {
     gap: 25px;
     align-items: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    border-left: 5px solid #d4af37;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reserva-barber:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.10);
+}
+
+.reserva-avui {
+    border-left: 5px solid #d4af37;
+    background: #fffdf5;
+}
+
+.reserva-passada {
+    border-left: 5px solid #aaa;
+    background: #f5f5f5;
+    opacity: 0.82;
 }
 
 .reserva-data {
@@ -422,6 +510,7 @@ footer a {
 
 .data-reserva {
     color: #666;
+    font-size: 14px;
 }
 
 .hora-reserva {
@@ -430,13 +519,22 @@ footer a {
     color: #d4af37;
 }
 
+.reserva-passada .hora-reserva {
+    color: #777;
+}
+
 .reserva-detalls h3 {
     margin: 0 0 10px;
+    font-size: 20px;
 }
 
 .reserva-detalls p {
     margin: 5px 0;
+    color: #444;
 }
+
+
+/* BOTÓ ELIMINAR */
 
 .boto-eliminar {
     background: #b3261e;
@@ -452,7 +550,43 @@ footer a {
     background: #8e1c17;
 }
 
+
+/* SENSE RESERVES */
+
+.sense-reserves {
+    background: white;
+    padding: 55px 40px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+.icona-sense-reserves {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #d4af37;
+    color: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.sense-reserves h2 {
+    margin-bottom: 8px;
+}
+
+.sense-reserves p {
+    color: #666;
+}
+
+
+/* TABLET */
+
 @media (max-width: 900px) {
+
     .hero {
         flex-direction: column;
         text-align: center;
@@ -477,9 +611,14 @@ footer a {
     .reserva-barber {
         grid-template-columns: 1fr;
     }
+
 }
 
+
+/* MOBIL */
+
 @media (max-width: 600px) {
+
     .serveis-grid {
         grid-template-columns: 1fr;
     }
@@ -511,4 +650,30 @@ footer a {
     .login-card {
         padding: 30px 25px;
     }
+
+    .panel-section {
+        padding: 35px 5%;
+    }
+
+    .panel-header h1 {
+        font-size: 34px;
+    }
+
+    .capcalera-grup h2 {
+        font-size: 22px;
+    }
+
+    .reserva-barber {
+        padding: 18px;
+        gap: 15px;
+    }
+
+    .hora-reserva {
+        font-size: 25px;
+    }
+
+    .boto-eliminar {
+        width: 100%;
+    }
+
 }
