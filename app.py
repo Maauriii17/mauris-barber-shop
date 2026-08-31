@@ -220,6 +220,8 @@ def api_ia():
     api_key = os.environ.get("GEMINI_API_KEY")
 
     if not api_key:
+        print("ERROR GEMINI: no existeix GEMINI_API_KEY")
+
         return jsonify({
             "ok": False,
             "missatge": "La IA no està configurada correctament."
@@ -233,7 +235,6 @@ Ets l'assistent de reserves de Mauri's Barber Shop.
 Has d'interpretar la petició d'un client i retornar NOMÉS un objecte JSON vàlid.
 
 Avui és {ara.date().isoformat()}.
-El dia de la setmana actual és {ara.strftime("%A")}.
 L'hora actual és {ara.strftime("%H:%M")} a Espanya.
 
 Els serveis disponibles són exactament:
@@ -242,12 +243,13 @@ Els serveis disponibles són exactament:
 - Tall + barba
 - Tall + neteja facial
 
-Les hores de la barberia són:
+Les hores disponibles de la barberia són:
 {", ".join(HORES)}
 
-Interpreta expressions com:
+Has d'entendre expressions en català com:
 - avui
 - demà
+- demà passat
 - dilluns
 - dimarts
 - dimecres
@@ -258,21 +260,20 @@ Interpreta expressions com:
 - al matí
 - a la tarda
 - cap a les 17
+- a les 18
 - el més aviat possible
 
-Peticio del client:
+Petició del client:
 "{peticio}"
 
-Retorna exactament aquest format JSON:
+Retorna NOMÉS JSON amb aquest format:
 
 {{
-    "servei": "nom exacte del servei o null",
+    "servei": "Tall de cabell, Barba, Tall + barba, Tall + neteja facial o null",
     "dia": "YYYY-MM-DD",
     "hora_preferida": "HH:MM o null",
     "franja": "mati, tarda o indiferent"
 }}
-
-No escriguis cap explicació fora del JSON.
 """
 
     try:
@@ -283,11 +284,24 @@ No escriguis cap explicació fora del JSON.
             contents=prompt
         )
 
+        print("RESPOSTA GEMINI COMPLETA:", resposta)
+
+        if not resposta.text:
+            raise Exception("Gemini no ha retornat text")
+
+        print("TEXT GEMINI:", resposta.text)
+
         text_json = netejar_json_ia(resposta.text)
+
+        print("JSON NETEJAT:", text_json)
 
         interpretacio = json.loads(text_json)
 
-    except Exception:
+        print("JSON INTERPRETAT:", interpretacio)
+
+    except Exception as error:
+        print("ERROR GEMINI:", repr(error))
+
         return jsonify({
             "ok": False,
             "missatge": "No he pogut interpretar la petició. Prova d'escriure-la d'una altra manera."
@@ -303,6 +317,7 @@ No escriguis cap explicació fora del JSON.
 
     try:
         dia_seleccionat = date.fromisoformat(dia)
+
     except (ValueError, TypeError):
         return jsonify({
             "ok": False,
@@ -351,8 +366,8 @@ No escriguis cap explicació fora del JSON.
                 )
             )
 
-        except Exception:
-            pass
+        except Exception as error:
+            print("ERROR ORDENANT HORES:", repr(error))
 
     recomanada = disponibles[0]
     alternatives = disponibles[1:3]
@@ -384,6 +399,7 @@ def api_reservar():
 
     try:
         dia_seleccionat = date.fromisoformat(dia)
+
     except ValueError:
         return jsonify({
             "ok": False,
