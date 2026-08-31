@@ -1,73 +1,141 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ca">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Mauri's Barber Shop</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-
-    <meta name="theme-color" content="#0f172a">
-
+    <meta name="theme-color" content="#111111">
 </head>
 
 <body>
 
 <nav>
+    <div class="logo">MAURI'S BARBER SHOP</div>
 
-    <a href="/">Inici</a>
-    <a href="/reserva">Reservar</a>
-
+    <div class="nav-links">
+        <a href="/">Inici</a>
+        <a href="/login/client">Reservar cita</a>
+        <a href="/login/barber">Accés barber</a>
+    </div>
 </nav>
 
-<div class="hero">
+<section class="hero">
 
-    <!-- IMATGE -->
-    <img class="hero-img" src="{{ url_for('static', filename='imgbarberia.jpeg') }}">
+    <div class="hero-text">
 
-    <h1>Mauri's Barber Shop 💈</h1>
+        <p class="petit-titol">MAURI'S BARBER SHOP</p>
 
-    <p>Sistema automatitzat de reserves per a clients de Mauri's Barber Shop</p>
+        <h1>El teu estil.<br>La teva cita.</h1>
 
-    <!-- CLIENT -->
-    <a class="btn" href="/login/client">
-        Entrar com client
+        <p class="descripcio">
+            Reserva la teva cita de manera ràpida i automàtica,
+            sense trucades ni esperes.
+        </p>
+
+        <div class="hero-botons">
+            <a href="/login/client" class="boto-principal">
+                Reservar cita
+            </a>
+
+            <a href="/login/barber" class="boto-secundari">
+                Accés barber
+            </a>
+        </div>
+
+    </div>
+
+    <div class="hero-image">
+        <img src="{{ url_for('static', filename='imgbarberia.jpeg') }}"
+             alt="Mauri's Barber Shop">
+    </div>
+
+</section>
+
+<section class="serveis">
+
+    <p class="petit-titol fosc">ELS NOSTRES SERVEIS</p>
+
+    <h2>Tria el teu servei</h2>
+
+    <div class="serveis-grid">
+
+        <div class="servei">
+            <h3>Tall de cabell</h3>
+            <p>Tall personalitzat i acabat professional.</p>
+
+            <div class="servei-info">
+                <span>30 min</span>
+                <strong>15 €</strong>
+            </div>
+
+            <a href="/login/client">Reservar</a>
+        </div>
+
+        <div class="servei">
+            <h3>Barba</h3>
+            <p>Perfilat i arreglat de barba.</p>
+
+            <div class="servei-info">
+                <span>20 min</span>
+                <strong>10 €</strong>
+            </div>
+
+            <a href="/login/client">Reservar</a>
+        </div>
+
+        <div class="servei">
+            <h3>Tall + barba</h3>
+            <p>Servei complet de cabell i barba.</p>
+
+            <div class="servei-info">
+                <span>45 min</span>
+                <strong>20 €</strong>
+            </div>
+
+            <a href="/login/client">Reservar</a>
+        </div>
+
+        <div class="servei">
+            <h3>Tall + neteja facial</h3>
+            <p>Tall de cabell amb servei de neteja facial.</p>
+
+            <div class="servei-info">
+                <span>50 min</span>
+                <strong>25 €</strong>
+            </div>
+
+            <a href="/login/client">Reservar</a>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="automatitzacio">
+
+    <h2>Reserva sense trucades</h2>
+
+    <p>
+        Consulta la disponibilitat, selecciona el servei,
+        tria una hora lliure i confirma la cita.
+        El sistema s'encarrega d'organitzar automàticament les reserves.
+    </p>
+
+    <a href="/login/client" class="boto-principal">
+        Veure disponibilitat
     </a>
 
-    <!-- BARBER -->
-    <a class="btn2" href="/login/barber">
-        Entrar com barber
-    </a>
+</section>
 
-</div>
-
-<div class="caixa">
-
-    <h2>Serveis i preus</h2>
-
-    <div class="servei">
-        <h3>✂️ Tall de cabell</h3>
-        <p>15€</p>
-    </div>
-
-    <div class="servei">
-        <h3>🧔 Barba</h3>
-        <p>10€</p>
-    </div>
-
-    <div class="servei">
-        <h3>💈 Tall + barba</h3>
-        <p>20€</p>
-    </div>
-
-    <div class="servei">
-        <h3>🔥 Tall + neteja facial</h3>
-        <p>25€</p>
-    </div>
-
-</div>
+<footer>
+    <h3>Mauri's Barber Shop</h3>
+    <p>Sistema de reserves online</p>
+    <a href="/login/barber">Accés per al barber</a>
+</footer>
 
 <script>
 if ("serviceWorker" in navigator) {
