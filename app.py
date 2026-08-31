@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
+from google import genai
+import os
+import json
 
 app = Flask(__name__)
 app.secret_key = "mauris-barber-shop-secret"
@@ -43,32 +46,43 @@ def minuts_hora(hora):
     return int(hores) * 60 + int(minuts)
 
 
-def obtenir_hores_properes(dia, hora_demanada):
+def hora_disponible(dia, hora):
     ara = ara_madrid()
     avui = ara.date()
 
-    dia_seleccionat = date.fromisoformat(dia)
+    try:
+        dia_seleccionat = date.fromisoformat(dia)
+    except ValueError:
+        return False
 
+    if dia_seleccionat < avui:
+        return False
+
+    if dia_seleccionat == avui:
+        hora_possible = datetime.strptime(hora, "%H:%M").time()
+
+        if hora_possible <= ara.time():
+            return False
+
+    for cita in cites:
+        if cita["dia"] == dia and cita["hora"] == hora:
+            return False
+
+    return True
+
+
+def obtenir_hores_disponibles(dia):
     disponibles = []
 
     for hora in HORES:
-        ocupada = False
+        if hora_disponible(dia, hora):
+            disponibles.append(hora)
 
-        for cita in cites:
-            if cita["dia"] == dia and cita["hora"] == hora:
-                ocupada = True
-                break
+    return disponibles
 
-        if ocupada:
-            continue
 
-        if dia_seleccionat == avui:
-            hora_possible = datetime.strptime(hora, "%H:%M").time()
-
-            if hora_possible <= ara.time():
-                continue
-
-        disponibles.append(hora)
+def obtenir_hores_properes(dia, hora_demanada):
+    disponibles = obtenir_hores_disponibles(dia)
 
     hora_base = minuts_hora(hora_demanada)
 
@@ -77,6 +91,21 @@ def obtenir_hores_properes(dia, hora_demanada):
     )
 
     return disponibles[:3]
+
+
+def netejar_json_ia(text):
+    text = text.strip()
+
+    if text.startswith("```json"):
+        text = text[7:]
+
+    elif text.startswith("```"):
+        text = text[3:]
+
+    if text.endswith("```"):
+        text = text[:-3]
+
+    return text.strip()
 
 
 @app.route("/")
@@ -150,16 +179,11 @@ def api_hores(dia):
     if dia_seleccionat < avui:
         return jsonify([])
 
-    ocupades = []
-
-    for cita in cites:
-        if cita["dia"] == dia:
-            ocupades.append(cita["hora"])
-
     resultat = []
 
     for hora in HORES:
         passada = False
+        ocupada = False
 
         if dia_seleccionat == avui:
             hora_cita = datetime.strptime(hora, "%H:%M").time()
@@ -167,13 +191,180 @@ def api_hores(dia):
             if hora_cita <= ara.time():
                 passada = True
 
+        for cita in cites:
+            if cita["dia"] == dia and cita["hora"] == hora:
+                ocupada = True
+                break
+
         resultat.append({
             "hora": hora,
-            "ocupada": hora in ocupades,
+            "ocupada": ocupada,
             "passada": passada
         })
 
     return jsonify(resultat)
+
+
+@app.route("/api/ia", methods=["POST"])
+def api_ia():
+    data = request.get_json() or {}
+
+    peticio = data.get("peticio", "").strip()
+
+    if not peticio:
+        return jsonify({
+            "ok": False,
+            "missatge": "Escriu què necessites."
+        })
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+
+    if not api_key:
+        return jsonify({
+            "ok": False,
+            "missatge": "La IA no està configurada correctament."
+        })
+
+    ara = ara_madrid()
+
+    prompt = f"""
+Ets l'assistent de reserves de Mauri's Barber Shop.
+
+Has d'interpretar la petició d'un client i retornar NOMÉS un objecte JSON vàlid.
+
+Avui és {ara.date().isoformat()}.
+El dia de la setmana actual és {ara.strftime("%A")}.
+L'hora actual és {ara.strftime("%H:%M")} a Espanya.
+
+Els serveis disponibles són exactament:
+- Tall de cabell
+- Barba
+- Tall + barba
+- Tall + neteja facial
+
+Les hores de la barberia són:
+{", ".join(HORES)}
+
+Interpreta expressions com:
+- avui
+- demà
+- dilluns
+- dimarts
+- dimecres
+- dijous
+- divendres
+- dissabte
+- diumenge
+- al matí
+- a la tarda
+- cap a les 17
+- el més aviat possible
+
+Peticio del client:
+"{peticio}"
+
+Retorna exactament aquest format JSON:
+
+{{
+    "servei": "nom exacte del servei o null",
+    "dia": "YYYY-MM-DD",
+    "hora_preferida": "HH:MM o null",
+    "franja": "mati, tarda o indiferent"
+}}
+
+No escriguis cap explicació fora del JSON.
+"""
+
+    try:
+        client = genai.Client(api_key=api_key)
+
+        resposta = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+
+        text_json = netejar_json_ia(resposta.text)
+
+        interpretacio = json.loads(text_json)
+
+    except Exception:
+        return jsonify({
+            "ok": False,
+            "missatge": "No he pogut interpretar la petició. Prova d'escriure-la d'una altra manera."
+        })
+
+    servei = interpretacio.get("servei")
+    dia = interpretacio.get("dia")
+    hora_preferida = interpretacio.get("hora_preferida")
+    franja = interpretacio.get("franja", "indiferent")
+
+    if servei not in SERVEIS:
+        servei = None
+
+    try:
+        dia_seleccionat = date.fromisoformat(dia)
+    except (ValueError, TypeError):
+        return jsonify({
+            "ok": False,
+            "missatge": "No he pogut identificar correctament el dia."
+        })
+
+    if dia_seleccionat < ara.date():
+        return jsonify({
+            "ok": False,
+            "missatge": "La data interpretada ja ha passat."
+        })
+
+    disponibles = obtenir_hores_disponibles(dia)
+
+    if franja == "mati":
+        hores_franja = [
+            h for h in disponibles
+            if minuts_hora(h) < 14 * 60
+        ]
+
+        if hores_franja:
+            disponibles = hores_franja
+
+    elif franja == "tarda":
+        hores_franja = [
+            h for h in disponibles
+            if minuts_hora(h) >= 14 * 60
+        ]
+
+        if hores_franja:
+            disponibles = hores_franja
+
+    if not disponibles:
+        return jsonify({
+            "ok": False,
+            "missatge": "No queden hores disponibles per al dia que has demanat."
+        })
+
+    if hora_preferida:
+        try:
+            hora_base = minuts_hora(hora_preferida)
+
+            disponibles.sort(
+                key=lambda h: abs(
+                    minuts_hora(h) - hora_base
+                )
+            )
+
+        except Exception:
+            pass
+
+    recomanada = disponibles[0]
+    alternatives = disponibles[1:3]
+
+    return jsonify({
+        "ok": True,
+        "servei": servei,
+        "dia": dia,
+        "hora": recomanada,
+        "alternatives": alternatives,
+        "missatge": "He trobat una cita que encaixa amb la teva petició."
+    })
 
 
 @app.route("/api/reservar", methods=["POST"])
@@ -262,14 +453,60 @@ def panelbarber():
     if session.get("rol") != "barber":
         return redirect("/login/barber")
 
-    cites_ordenades = sorted(
-        cites,
-        key=lambda cita: (cita["dia"], cita["hora"])
+    ara = ara_madrid()
+    avui = ara.date()
+
+    cites_avui = []
+    cites_futures = []
+    cites_passades = []
+
+    for index, cita in enumerate(cites):
+        cita_panel = cita.copy()
+        cita_panel["index"] = index
+
+        dia_cita = date.fromisoformat(cita["dia"])
+
+        hora_cita = datetime.strptime(
+            cita["hora"],
+            "%H:%M"
+        ).time()
+
+        if dia_cita < avui:
+            cites_passades.append(cita_panel)
+
+        elif dia_cita > avui:
+            cites_futures.append(cita_panel)
+
+        else:
+            if hora_cita < ara.time():
+                cites_passades.append(cita_panel)
+            else:
+                cites_avui.append(cita_panel)
+
+    cites_avui.sort(
+        key=lambda cita: cita["hora"]
+    )
+
+    cites_futures.sort(
+        key=lambda cita: (
+            cita["dia"],
+            cita["hora"]
+        )
+    )
+
+    cites_passades.sort(
+        key=lambda cita: (
+            cita["dia"],
+            cita["hora"]
+        ),
+        reverse=True
     )
 
     return render_template(
         "panelbarber.html",
-        cites=cites_ordenades
+        cites_avui=cites_avui,
+        cites_futures=cites_futures,
+        cites_passades=cites_passades
     )
 
 
