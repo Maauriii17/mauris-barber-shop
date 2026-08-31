@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
-from google import genai
-import os
-import json
 
 app = Flask(__name__)
 app.secret_key = "mauris-barber-shop-secret"
@@ -91,21 +88,6 @@ def obtenir_hores_properes(dia, hora_demanada):
     )
 
     return disponibles[:3]
-
-
-def netejar_json_ia(text):
-    text = text.strip()
-
-    if text.startswith("```json"):
-        text = text[7:]
-
-    elif text.startswith("```"):
-        text = text[3:]
-
-    if text.endswith("```"):
-        text = text[:-3]
-
-    return text.strip()
 
 
 @app.route("/")
@@ -205,183 +187,6 @@ def api_hores(dia):
     return jsonify(resultat)
 
 
-@app.route("/api/ia", methods=["POST"])
-def api_ia():
-    data = request.get_json() or {}
-
-    peticio = data.get("peticio", "").strip()
-
-    if not peticio:
-        return jsonify({
-            "ok": False,
-            "missatge": "Escriu què necessites."
-        })
-
-    api_key = os.environ.get("GEMINI_API_KEY")
-
-    if not api_key:
-        print("ERROR GEMINI: no existeix GEMINI_API_KEY")
-
-        return jsonify({
-            "ok": False,
-            "missatge": "La IA no està configurada correctament."
-        })
-
-    ara = ara_madrid()
-
-    prompt = f"""
-Ets l'assistent de reserves de Mauri's Barber Shop.
-
-Has d'interpretar la petició d'un client i retornar NOMÉS un objecte JSON vàlid.
-
-Avui és {ara.date().isoformat()}.
-L'hora actual és {ara.strftime("%H:%M")} a Espanya.
-
-Els serveis disponibles són exactament:
-- Tall de cabell
-- Barba
-- Tall + barba
-- Tall + neteja facial
-
-Les hores disponibles de la barberia són:
-{", ".join(HORES)}
-
-Has d'entendre expressions en català com:
-- avui
-- demà
-- demà passat
-- dilluns
-- dimarts
-- dimecres
-- dijous
-- divendres
-- dissabte
-- diumenge
-- al matí
-- a la tarda
-- cap a les 17
-- a les 18
-- el més aviat possible
-
-Petició del client:
-"{peticio}"
-
-Retorna NOMÉS JSON amb aquest format:
-
-{{
-    "servei": "Tall de cabell, Barba, Tall + barba, Tall + neteja facial o null",
-    "dia": "YYYY-MM-DD",
-    "hora_preferida": "HH:MM o null",
-    "franja": "mati, tarda o indiferent"
-}}
-"""
-
-    try:
-        client = genai.Client(api_key=api_key)
-
-        resposta = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-
-        print("RESPOSTA GEMINI COMPLETA:", resposta)
-
-        if not resposta.text:
-            raise Exception("Gemini no ha retornat text")
-
-        print("TEXT GEMINI:", resposta.text)
-
-        text_json = netejar_json_ia(resposta.text)
-
-        print("JSON NETEJAT:", text_json)
-
-        interpretacio = json.loads(text_json)
-
-        print("JSON INTERPRETAT:", interpretacio)
-
-    except Exception as error:
-        print("ERROR GEMINI:", repr(error))
-
-        return jsonify({
-            "ok": False,
-            "missatge": "No he pogut interpretar la petició. Prova d'escriure-la d'una altra manera."
-        })
-
-    servei = interpretacio.get("servei")
-    dia = interpretacio.get("dia")
-    hora_preferida = interpretacio.get("hora_preferida")
-    franja = interpretacio.get("franja", "indiferent")
-
-    if servei not in SERVEIS:
-        servei = None
-
-    try:
-        dia_seleccionat = date.fromisoformat(dia)
-
-    except (ValueError, TypeError):
-        return jsonify({
-            "ok": False,
-            "missatge": "No he pogut identificar correctament el dia."
-        })
-
-    if dia_seleccionat < ara.date():
-        return jsonify({
-            "ok": False,
-            "missatge": "La data interpretada ja ha passat."
-        })
-
-    disponibles = obtenir_hores_disponibles(dia)
-
-    if franja == "mati":
-        hores_franja = [
-            h for h in disponibles
-            if minuts_hora(h) < 14 * 60
-        ]
-
-        if hores_franja:
-            disponibles = hores_franja
-
-    elif franja == "tarda":
-        hores_franja = [
-            h for h in disponibles
-            if minuts_hora(h) >= 14 * 60
-        ]
-
-        if hores_franja:
-            disponibles = hores_franja
-
-    if not disponibles:
-        return jsonify({
-            "ok": False,
-            "missatge": "No queden hores disponibles per al dia que has demanat."
-        })
-
-    if hora_preferida:
-        try:
-            hora_base = minuts_hora(hora_preferida)
-
-            disponibles.sort(
-                key=lambda h: abs(
-                    minuts_hora(h) - hora_base
-                )
-            )
-
-        except Exception as error:
-            print("ERROR ORDENANT HORES:", repr(error))
-
-    recomanada = disponibles[0]
-    alternatives = disponibles[1:3]
-
-    return jsonify({
-        "ok": True,
-        "servei": servei,
-        "dia": dia,
-        "hora": recomanada,
-        "alternatives": alternatives,
-        "missatge": "He trobat una cita que encaixa amb la teva petició."
-    })
-
-
 @app.route("/api/reservar", methods=["POST"])
 def api_reservar():
     data = request.get_json() or {}
@@ -399,7 +204,6 @@ def api_reservar():
 
     try:
         dia_seleccionat = date.fromisoformat(dia)
-
     except ValueError:
         return jsonify({
             "ok": False,
